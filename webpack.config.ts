@@ -1,46 +1,45 @@
-import 'webpack-dev-server';
-import 'dotenv/config';
+import "webpack-dev-server";
+import "dotenv/config";
 
-import WatchFilePlugin from '@mytonwallet/webpack-watch-file-plugin';
-import StatoscopeWebpackPlugin from '@statoscope/webpack-plugin';
-import { statSync } from 'fs';
-import { GitRevisionPlugin } from 'git-revision-webpack-plugin';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
-import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import path from 'path';
-import type { Compiler, Configuration } from 'webpack';
+import webpack from "webpack";
+
+import WatchFilePlugin from "@mytonwallet/webpack-watch-file-plugin";
+import StatoscopeWebpackPlugin from "@statoscope/webpack-plugin";
+import { statSync } from "fs";
+import { GitRevisionPlugin } from "git-revision-webpack-plugin";
+import HtmlWebpackPlugin from "html-webpack-plugin";
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
+import path from "path";
+import type { Compiler, Configuration } from "webpack";
 import {
   ContextReplacementPlugin,
   DefinePlugin,
   EnvironmentPlugin,
   NormalModuleReplacementPlugin,
   ProvidePlugin,
-} from 'webpack';
+} from "webpack";
 
-import { PRODUCTION_URL } from './src/config.ts';
-import { version as appVersion } from './package.json' with { type: 'json' };
+import { PRODUCTION_URL } from "./src/config.ts";
+import { version as appVersion } from "./package.json" with { type: "json" };
 
 const {
   HEAD,
-  APP_ENV = 'production',
-  APP_MOCKED_CLIENT = '',
-  HTTPS_CERT_PATH = '',
-  HTTPS_KEY_PATH = '',
+  APP_ENV = "production",
+  APP_MOCKED_CLIENT = "",
+  HTTPS_CERT_PATH = "",
+  HTTPS_KEY_PATH = "",
 } = process.env;
 
-const DEFAULT_APP_TITLE = `Telegram${APP_ENV !== 'production' ? ' Beta' : ''}`;
+const DEFAULT_APP_TITLE = `Telegram${APP_ENV !== "production" ? " Beta" : ""}`;
 
 // GitHub workflow uses an empty string as the default value if it's not in repository variables, so we cannot define a default value here
 process.env.BASE_URL = process.env.BASE_URL || PRODUCTION_URL;
 
-const {
-  BASE_URL,
-  APP_TITLE = DEFAULT_APP_TITLE,
-} = process.env;
+const { BASE_URL, APP_TITLE = DEFAULT_APP_TITLE } = process.env;
 
 const CSP = `
   default-src 'self';
-  connect-src 'self' wss://*.web.telegram.org blob: http: https: ${APP_ENV === 'development' ? 'wss: ipc:' : ''};
+  connect-src 'self' wss://*.tg.dogma-project.org blob: http: https: ${APP_ENV === "development" ? "wss: ipc:" : ""};
   script-src 'self' 'wasm-unsafe-eval' https://t.me/_websync_ https://telegram.me/_websync_;
   style-src 'self' 'unsafe-inline';
   img-src 'self' data: blob: https://ss3.4sqi.net/img/categories_v2/;
@@ -51,18 +50,19 @@ const CSP = `
     nicegram-tc: safepal-tc: tonkeeper-pro-tc: tonkeeper-tc:;
   base-uri 'none';
   form-action 'none';`
-  .replace(/\s+/g, ' ').trim();
+  .replace(/\s+/g, " ")
+  .trim();
 
-const CHANGELOG_PATH = path.resolve(__dirname, 'src/versionNotification.txt');
+const CHANGELOG_PATH = path.resolve(__dirname, "src/versionNotification.txt");
 
 export default function createConfig(
   _: any,
-  { mode = 'production' }: { mode: 'none' | 'development' | 'production' },
+  { mode = "production" }: { mode: "none" | "development" | "production" },
 ): Configuration {
-  let server: Required<Configuration>['devServer']['server'] = 'http';
+  let server: Required<Configuration>["devServer"]["server"] = "http";
   if (HTTPS_CERT_PATH && HTTPS_KEY_PATH) {
     server = {
-      type: 'https',
+      type: "https",
       options: {
         key: HTTPS_KEY_PATH,
         cert: HTTPS_CERT_PATH,
@@ -72,13 +72,13 @@ export default function createConfig(
 
   return {
     mode,
-    entry: './src/index.tsx',
-    target: 'web',
+    entry: "./src/index.tsx",
+    target: "web",
 
     devServer: {
       port: 1234,
-      host: '0.0.0.0',
-      allowedHosts: 'all',
+      host: "0.0.0.0",
+      allowedHosts: "all",
       hot: false,
       client: {
         overlay: false,
@@ -86,37 +86,39 @@ export default function createConfig(
       server,
       static: [
         {
-          directory: path.resolve(__dirname, 'public'),
+          directory: path.resolve(__dirname, "public"),
         },
         {
-          directory: path.resolve(__dirname, 'node_modules/emoji-data-ios'),
+          directory: path.resolve(__dirname, "node_modules/emoji-data-ios"),
         },
         {
-          directory: path.resolve(__dirname, 'node_modules/opus-recorder/dist'),
+          directory: path.resolve(__dirname, "node_modules/opus-recorder/dist"),
         },
         {
-          directory: path.resolve(__dirname, 'src/lib/rlottie'),
+          directory: path.resolve(__dirname, "src/lib/rlottie"),
         },
         {
-          directory: path.resolve(__dirname, 'src/lib/video-preview'),
+          directory: path.resolve(__dirname, "src/lib/video-preview"),
         },
         {
-          directory: path.resolve(__dirname, 'src/lib/secret-sauce'),
+          directory: path.resolve(__dirname, "src/lib/secret-sauce"),
         },
       ],
       devMiddleware: {
-        stats: 'minimal',
+        stats: "minimal",
       },
       headers: {
-        'Content-Security-Policy': CSP,
+        "Content-Security-Policy": CSP,
       },
     },
 
     output: {
-      filename: '[name].[contenthash].js',
-      chunkFilename: '[id].[chunkhash].js',
-      assetModuleFilename: '[name].[contenthash][ext]',
-      path: path.resolve(__dirname, 'dist'),
+      // filename: '[name].[contenthash].js',
+      filename: "app.[contenthash].js",
+      // chunkFilename: "[id].[chunkhash].js",
+      // assetModuleFilename: "[name].[contenthash][ext]",
+      assetModuleFilename: "assets.[contenthash][ext]",
+      path: path.resolve(__dirname, "dist"),
       clean: true,
     },
 
@@ -124,7 +126,7 @@ export default function createConfig(
       rules: [
         {
           test: /\.(ts|tsx|js|mjs|cjs)$/,
-          loader: 'babel-loader',
+          loader: "babel-loader",
           exclude: /node_modules/,
         },
         {
@@ -132,7 +134,7 @@ export default function createConfig(
           use: [
             MiniCssExtractPlugin.loader,
             {
-              loader: 'css-loader',
+              loader: "css-loader",
               options: {
                 importLoaders: 1,
                 modules: {
@@ -141,7 +143,7 @@ export default function createConfig(
                 },
               },
             },
-            'postcss-loader',
+            "postcss-loader",
           ],
         },
         {
@@ -149,45 +151,48 @@ export default function createConfig(
           use: [
             MiniCssExtractPlugin.loader,
             {
-              loader: 'css-loader',
+              loader: "css-loader",
               options: {
                 modules: {
                   namedExport: false,
-                  exportLocalsConvention: 'camelCase',
+                  exportLocalsConvention: "camelCase",
                   auto: true,
-                  localIdentName: APP_ENV === 'production' ? '[sha1:hash:base64:8]' : '[name]__[local]',
+                  localIdentName:
+                    APP_ENV === "production"
+                      ? "[sha1:hash:base64:8]"
+                      : "[name]__[local]",
                 },
               },
             },
-            'postcss-loader',
-            'sass-loader',
+            "postcss-loader",
+            "sass-loader",
           ],
         },
         {
           test: /\.(woff(2)?|ttf|eot|svg|png|jpg|tgs|webp)(\?v=\d+\.\d+\.\d+)?$/,
-          type: 'asset/resource',
+          type: "asset/resource",
         },
         {
           test: /\.wasm$/,
-          type: 'asset/resource',
+          type: "asset/resource",
         },
         {
           test: /\.(txt|tl|strings)$/i,
-          type: 'asset/source',
+          type: "asset/source",
         },
       ],
     },
 
     resolve: {
-      extensions: ['.js', '.cjs', '.mjs', '.ts', '.tsx'],
+      extensions: [".js", ".cjs", ".mjs", ".ts", ".tsx"],
       alias: {
-        '@teact$': path.resolve(__dirname, './src/lib/teact/teact.ts'),
-        '@teact': path.resolve(__dirname, './src/lib/teact'),
+        "@teact$": path.resolve(__dirname, "./src/lib/teact/teact.ts"),
+        "@teact": path.resolve(__dirname, "./src/lib/teact"),
       },
       fallback: {
-        path: require.resolve('path-browserify'),
-        os: require.resolve('os-browserify/browser'),
-        buffer: require.resolve('buffer/'),
+        path: require.resolve("path-browserify"),
+        os: require.resolve("os-browserify/browser"),
+        buffer: require.resolve("buffer/"),
         fs: false,
         crypto: false,
       },
@@ -199,29 +204,43 @@ export default function createConfig(
         /highlight\.js[\\/]lib[\\/]languages/,
         /^((?!\.js\.js).)*$/,
       ),
-      ...(APP_MOCKED_CLIENT === '1'
-        ? [new NormalModuleReplacementPlugin(
-          /src[\\/]lib[\\/]gramjs[\\/]client[\\/]TelegramClient\.js/,
-          './MockClient.ts',
-        )]
+      ...(APP_MOCKED_CLIENT === "1"
+        ? [
+            new NormalModuleReplacementPlugin(
+              /src[\\/]lib[\\/]gramjs[\\/]client[\\/]TelegramClient\.js/,
+              "./MockClient.ts",
+            ),
+          ]
         : []),
       new HtmlWebpackPlugin({
         appTitle: APP_TITLE,
-        appleIcon: APP_ENV === 'production' ? 'apple-touch-icon' : 'apple-touch-icon-dev',
-        mainIcon: APP_ENV === 'production' ? 'icon-192x192' : 'icon-dev-192x192',
-        manifest: APP_ENV === 'production' ? 'site.webmanifest' : 'site_dev.webmanifest',
+        appleIcon:
+          APP_ENV === "production"
+            ? "apple-touch-icon"
+            : "apple-touch-icon-dev",
+        mainIcon:
+          APP_ENV === "production" ? "icon-192x192" : "icon-dev-192x192",
+        manifest:
+          APP_ENV === "production"
+            ? "site.webmanifest"
+            : "site_dev.webmanifest",
         baseUrl: BASE_URL,
         csp: CSP,
-        template: 'src/index.html',
+        template: "src/index.html",
       }),
       new MiniCssExtractPlugin({
-        filename: '[name].[contenthash].css',
-        chunkFilename: '[name].[chunkhash].css',
+        filename: "app.[contenthash].css",
+        // chunkFilename: "[name].[chunkhash].css",
         ignoreOrder: true,
+      }),
+      new webpack.optimize.LimitChunkCountPlugin({
+        maxChunks: 1,
       }),
       new EnvironmentPlugin({
         APP_ENV,
         APP_MOCKED_CLIENT,
+        // eslint-disable-next-line no-null/no-null
+        APP_CODE_NAME: null,
         // eslint-disable-next-line no-null/no-null
         APP_NAME: null,
         APP_TITLE,
@@ -234,26 +253,39 @@ export default function createConfig(
       // Updates each dev re-build to provide current git branch or commit hash
       new DefinePlugin({
         APP_VERSION: JSON.stringify(appVersion),
-        APP_REVISION: DefinePlugin.runtimeValue(() => {
-          const { branch, commit } = getGitMetadata();
-          const shouldDisplayOnlyCommit = APP_ENV === 'staging' || !branch || branch === 'HEAD';
-          return JSON.stringify(shouldDisplayOnlyCommit ? commit : `${branch}#${commit}`);
-        }, mode === 'development' ? true : []),
-        CHANGELOG_DATETIME: DefinePlugin.runtimeValue(() => {
-          return JSON.stringify(statSync(CHANGELOG_PATH, { throwIfNoEntry: false })?.mtime.getTime());
-        }, {
-          fileDependencies: [CHANGELOG_PATH],
-        }),
+        APP_REVISION: DefinePlugin.runtimeValue(
+          () => {
+            const { branch, commit } = getGitMetadata();
+            const shouldDisplayOnlyCommit =
+              APP_ENV === "staging" || !branch || branch === "HEAD";
+            return JSON.stringify(
+              shouldDisplayOnlyCommit ? commit : `${branch}#${commit}`,
+            );
+          },
+          mode === "development" ? true : [],
+        ),
+        CHANGELOG_DATETIME: DefinePlugin.runtimeValue(
+          () => {
+            return JSON.stringify(
+              statSync(CHANGELOG_PATH, {
+                throwIfNoEntry: false,
+              })?.mtime.getTime(),
+            );
+          },
+          {
+            fileDependencies: [CHANGELOG_PATH],
+          },
+        ),
       }),
       new ProvidePlugin({
-        Buffer: ['buffer', 'Buffer'],
+        Buffer: ["buffer", "Buffer"],
       }),
       new StatoscopeWebpackPlugin({
         statsOptions: {
           context: __dirname,
         },
-        saveReportTo: path.resolve('./public/statoscope-report.html'),
-        saveStatsTo: path.resolve('./public/build-stats.json'),
+        saveReportTo: path.resolve("./public/statoscope-report.html"),
+        saveStatsTo: path.resolve("./public/build-stats.json"),
         normalizeStats: true,
         open: false,
         extensions: [new WebpackContextExtension()],
@@ -261,36 +293,30 @@ export default function createConfig(
       new WatchFilePlugin({
         rules: [
           {
-            files: 'src/assets/localization/fallback.strings',
-            action: 'npm run lang:ts',
+            files: "src/assets/localization/fallback.strings",
+            action: "npm run lang:ts",
           },
           {
-            files: 'src/lib/gramjs/tl/static/**/*',
-            action: 'npm run gramjs:tl',
+            files: "src/lib/gramjs/tl/static/**/*",
+            action: "npm run gramjs:tl",
             sharedAction: true,
           },
           {
-            files: 'src/assets/font-icons/*.svg',
-            action: 'npm run icons:build',
+            files: "src/assets/font-icons/*.svg",
+            action: "npm run icons:build",
             sharedAction: true,
           },
         ],
       }),
     ],
 
-    devtool: 'source-map',
+    devtool: "source-map",
 
     optimization: {
-      splitChunks: {
-        cacheGroups: {
-          sharedComponents: {
-            name: 'shared-components',
-            test: /[\\/]src[\\/]components[\\/]ui[\\/]/,
-          },
-        },
-      },
-      ...(APP_ENV === 'staging' && {
-        chunkIds: 'named',
+      splitChunks: false,
+      runtimeChunk: false,
+      ...(APP_ENV === "staging" && {
+        chunkIds: "named",
       }),
     },
   };
@@ -307,7 +333,7 @@ class WebpackContextExtension {
   context: string;
 
   constructor() {
-    this.context = '';
+    this.context = "";
   }
 
   handleCompiler(compiler: Compiler) {
@@ -316,7 +342,10 @@ class WebpackContextExtension {
 
   getExtension() {
     return {
-      descriptor: { name: 'custom-webpack-extension-context', version: '1.0.0' },
+      descriptor: {
+        name: "custom-webpack-extension-context",
+        version: "1.0.0",
+      },
       payload: { context: this.context },
     };
   }
