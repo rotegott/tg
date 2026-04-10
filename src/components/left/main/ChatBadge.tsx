@@ -147,7 +147,7 @@ const ChatBadge = ({
     const statefulClassName = buildClassName(baseClassName, !shouldBeUnMuted && styles.muted);
 
     const unreadReactionsElement = unreadReactionsCount && (
-      <div className={buildClassName(statefulClassName, styles.reaction, styles.round)}>
+      <div className={buildClassName(baseClassName, styles.reaction, styles.round)}>
         <Icon name="heart" />
       </div>
     );
