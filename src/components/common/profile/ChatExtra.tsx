@@ -439,22 +439,24 @@ const ChatExtra = ({
       className={buildClassName("ChatExtra", className)}
       style={createVtnStyle("chatExtra")}
     >
-      <ListItem
-        icon="user"
-        multiline
-        className={styles.phone}
-        narrow
-        ripple
-        onClick={() => {
-          copy(userId || "???", oldLang("ID"));
-        }}
-        style={createVtnStyle("phone")}
-      >
-        <span className="title" dir={lang.isRtl ? "rtl" : undefined}>
-          {userId}
-        </span>
-        <span className="subtitle">{oldLang("ID")}</span>
-      </ListItem>
+      {peerId && (
+        <ListItem
+          icon="user"
+          multiline
+          className={styles.phone}
+          narrow
+          ripple
+          onClick={() => {
+            copy(peerId || "???", oldLang("ID"));
+          }}
+          style={createVtnStyle("phone")}
+        >
+          <span className="title" dir={lang.isRtl ? "rtl" : undefined}>
+            {peerId}
+          </span>
+          <span className="subtitle">{oldLang("ID")}</span>
+        </ListItem>
+      )}
 
       {personalChannel && (
         <div
