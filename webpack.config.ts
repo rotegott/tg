@@ -1,8 +1,6 @@
 import "webpack-dev-server";
 import "dotenv/config";
 
-import webpack from "webpack";
-
 import WatchFilePlugin from "@mytonwallet/webpack-watch-file-plugin";
 import StatoscopeWebpackPlugin from "@statoscope/webpack-plugin";
 import { statSync } from "fs";
@@ -11,6 +9,7 @@ import HtmlWebpackPlugin from "html-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import path from "path";
 import type { Compiler, Configuration } from "webpack";
+import webpack from "webpack";
 import {
   ContextReplacementPlugin,
   DefinePlugin,
@@ -79,7 +78,7 @@ export default function createConfig(
       port: 1234,
       host: "0.0.0.0",
       allowedHosts: "all",
-      hot: false,
+      hot: true,
       client: {
         overlay: false,
       },
@@ -206,11 +205,11 @@ export default function createConfig(
       ),
       ...(APP_MOCKED_CLIENT === "1"
         ? [
-            new NormalModuleReplacementPlugin(
-              /src[\\/]lib[\\/]gramjs[\\/]client[\\/]TelegramClient\.js/,
-              "./MockClient.ts",
-            ),
-          ]
+          new NormalModuleReplacementPlugin(
+            /src[\\/]lib[\\/]gramjs[\\/]client[\\/]TelegramClient\.js/,
+            "./MockClient.ts",
+          ),
+        ]
         : []),
       new HtmlWebpackPlugin({
         appTitle: APP_TITLE,
