@@ -743,6 +743,7 @@ addActionHandler('closeMapModal', (global, actions, payload): ActionReturnType =
 });
 
 addActionHandler('checkAppVersion', (global): ActionReturnType => {
+  return; // temp prevent
   fetch(`${APP_VERSION_URL}?${Date.now()}`)
     .then((response) => response.text())
     .then((version) => {
