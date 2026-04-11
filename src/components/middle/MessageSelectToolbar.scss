@@ -50,6 +50,7 @@
   &:not(.shown) {
     pointer-events: none;
     opacity: 0;
+    display: none; // test
 
     .shown-inner {
       transform: scaleX(var(--toolbar-hidden-scale, 1));
