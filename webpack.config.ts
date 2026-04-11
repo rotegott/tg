@@ -113,9 +113,9 @@ export default function createConfig(
 
     output: {
       // filename: '[name].[contenthash].js',
-      filename: "app.[contenthash].js",
       // chunkFilename: "[id].[chunkhash].js",
       // assetModuleFilename: "[name].[contenthash][ext]",
+      filename: "app.[contenthash].js",
       assetModuleFilename: "assets.[contenthash][ext]",
       path: path.resolve(__dirname, "dist"),
       clean: true,
@@ -283,8 +283,8 @@ export default function createConfig(
         statsOptions: {
           context: __dirname,
         },
-        saveReportTo: path.resolve("./public/statoscope-report.html"),
-        saveStatsTo: path.resolve("./public/build-stats.json"),
+        saveReportTo: path.resolve("./tmp/statoscope-report.html"),
+        saveStatsTo: path.resolve("./tmp/build-stats.json"),
         normalizeStats: true,
         open: false,
         extensions: [new WebpackContextExtension()],
